@@ -1,0 +1,4 @@
+flask
+dashscope
+python-docx
+pypdf2
