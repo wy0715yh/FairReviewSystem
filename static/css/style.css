@@ -190,6 +190,23 @@ textarea:focus {
     flex-shrink: 0;
 }
 
+.clear-file-btn {
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.clear-file-btn:hover {
+    background: #dc2626;
+    color: white;
+}
+
 input[type="file"] {
     display: none;
 }

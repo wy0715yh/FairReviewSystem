@@ -29,8 +29,16 @@ document.getElementById('audit-file').addEventListener('change', function(e) {
     if(e.target.files[0]) {
         selectedAuditFile = e.target.files[0];
         document.getElementById('file-name-display').innerText = selectedAuditFile.name;
+        document.getElementById('clear-file-btn').classList.remove('hidden');
     }
 });
+
+function clearSelectedFile() {
+    selectedAuditFile = null;
+    document.getElementById('audit-file').value = '';
+    document.getElementById('file-name-display').innerText = '未选择文件';
+    document.getElementById('clear-file-btn').classList.add('hidden');
+}
 
 async function startAudit() {
     const text = document.getElementById('audit-text').value;

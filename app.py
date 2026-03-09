@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 # --- 核心配置 ---
 # 请注意保护 Key 安全
-dashscope.api_key = "sk-56de1645973146d6a18633f434eea729"
+dashscope.api_key = "你自己的key-API"
 ADMIN_PASSWORD = "666"
 DB_PATH = "rules_storage"
 

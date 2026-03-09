@@ -50,6 +50,9 @@
                             <label for="audit-file">📄 上传文档 (PDF/DOCX)</label>
                             <input type="file" id="audit-file" accept=".pdf,.docx">
                             <span id="file-name-display">未选择文件</span>
+                            <button type="button" id="clear-file-btn" class="clear-file-btn hidden" onclick="clearSelectedFile()">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
                         </div>
                         <button class="action-btn" onclick="startAudit()">🚀 启动全维度审查</button>
                     </div>
