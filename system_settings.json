@@ -1,0 +1,9 @@
+{
+  "risk_threshold": {
+    "high": 0.8,
+    "medium": 0.5
+  },
+  "speed_mode": "fast",
+  "local_mode": true,
+  "retain_days": 9
+}

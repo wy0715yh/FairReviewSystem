@@ -3,113 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>公平竞争智能审查系统</title>
+    <title>法律合同风险智能审查助手</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
+<div class="app-container">
+    <aside class="sidebar">
+        <div class="logo-area">
+            <i class="fa-solid fa-scale-balanced"></i>
+            <h2>智审中心</h2>
+        </div>
 
-    <div class="app-container">
-        <aside class="sidebar">
-            <div class="logo-area">
-                <i class="fa-solid fa-scale-balanced"></i>
-                <h2>智审中心</h2>
+        <nav class="nav-menu">
+            <button class="nav-item active" data-panel="home-panel" onclick="switchTab('home-panel', this)">
+                <i class="fa-solid fa-house"></i> 首页
+            </button>
+            <button class="nav-item" data-panel="audit-panel" onclick="switchTab('audit-panel', this)">
+                <i class="fa-solid fa-file-contract"></i> 合同审查
+            </button>
+            <button class="nav-item" data-panel="rules-panel" onclick="switchTab('rules-panel', this)">
+                <i class="fa-solid fa-list-check"></i> 规则管理
+            </button>
+            <button class="nav-item" data-panel="report-panel" onclick="switchTab('report-panel', this)">
+                <i class="fa-solid fa-file-lines"></i> 审查报告
+            </button>
+            <button class="nav-item" data-panel="knowledge-panel" onclick="switchTab('knowledge-panel', this)">
+                <i class="fa-solid fa-book-open"></i> 法律知识库
+            </button>
+            <button class="nav-item" data-panel="settings-panel" onclick="switchTab('settings-panel', this)">
+                <i class="fa-solid fa-gears"></i> 系统设置
+            </button>
+        </nav>
+
+        <div class="status-card">
+            <h3>系统状态</h3>
+            <p><i class="fa-solid fa-bolt"></i> 引擎：MiniMax-M2.7</p>
+            <p><i class="fa-solid fa-server"></i> 模式：Local RAG</p>
+            <p><i class="fa-solid fa-shield-halved"></i> 规则：通用+自定义</p>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="main-header">
+            <h1>基于RAG与大模型的法律合同风险智能审查助手</h1>
+            <a href="/history" class="history-icon" title="审查历史"><i class="fa-solid fa-clock-rotate-left"></i></a>
+        </header>
+
+        <section id="home-panel" class="panel active">
+            <div class="home-grid">
+                <div class="card">
+                    <h3><i class="fa-solid fa-bullseye"></i> 核心能力</h3>
+                    <ul class="plain-list">
+                        <li>单份合同审查（Word/PDF/TXT/文本）</li>
+                        <li>批量合同审查（最多50份）</li>
+                        <li>自定义风险规则命中与关联展示</li>
+                        <li>RAG法规检索与法条依据引用</li>
+                        <li>结构化审查报告与历史留痕</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3><i class="fa-solid fa-route"></i> 快捷入口</h3>
+                    <div class="quick-actions">
+                        <button class="action-btn" onclick="switchTabById('audit-panel')">开始单份审查</button>
+                        <button class="action-btn ghost" onclick="switchTabById('audit-panel'); focusBatch();">开始批量审查</button>
+                        <button class="action-btn ghost" onclick="switchTabById('rules-panel')">管理自定义规则</button>
+                        <button class="action-btn ghost" onclick="switchTabById('knowledge-panel')">检索法律知识</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="audit-panel" class="panel">
+            <div class="split-view tri">
+                <div class="card input-card">
+                    <h3><i class="fa-solid fa-pen-nib"></i> 单份合同审查</h3>
+                    <textarea id="audit-text" placeholder="粘贴待审文本..."></textarea>
+                    <div class="file-upload-wrapper">
+                        <label for="audit-file">上传文档 (PDF/DOCX/TXT)</label>
+                        <input type="file" id="audit-file" accept=".pdf,.docx,.txt">
+                        <span id="file-name-display">未选择文件</span>
+                        <button type="button" id="clear-file-btn" class="clear-file-btn hidden" onclick="clearSelectedFile()"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <button class="action-btn" onclick="startAudit()">启动单份审查</button>
+                </div>
+
+                <div class="card input-card" id="batch-anchor">
+                    <h3><i class="fa-solid fa-layer-group"></i> 批量合同审查</h3>
+                    <textarea id="batch-texts" placeholder="可粘贴多份文本，使用空行分隔。"></textarea>
+                    <div class="file-upload-wrapper">
+                        <label for="batch-files">上传多份文档</label>
+                        <input type="file" id="batch-files" accept=".pdf,.docx,.txt" multiple>
+                        <span id="batch-file-name-display">未选择文件</span>
+                        <button type="button" id="clear-batch-files-btn" class="clear-file-btn hidden" onclick="clearBatchFiles()"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div id="batch-file-preview" class="file-preview-list">
+                        <div class="placeholder-text">可多次选择文件，系统会累计加入本次批量任务。</div>
+                    </div>
+                    <button class="action-btn" onclick="startBatchAudit()">启动批量审查</button>
+                </div>
+
+                <div class="card output-card">
+                    <h3><i class="fa-solid fa-chart-pie"></i> 审查结果</h3>
+                    <div id="audit-result" class="result-box">
+                        <div class="placeholder-text">请提交内容后开始审查...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="rules-panel" class="panel">
+            <div class="split-view">
+                <div class="card">
+                    <h3><i class="fa-solid fa-plus"></i> 自定义风险规则</h3>
+                    <input type="hidden" id="custom-rule-id">
+                    <input class="text-input" id="custom-rule-name" placeholder="规则名称">
+                    <select class="text-input" id="custom-rule-level">
+                        <option value="高">高</option>
+                        <option value="中" selected>中</option>
+                        <option value="低">低</option>
+                    </select>
+                    <input class="text-input" id="custom-rule-contract-type" placeholder="合同类型（如：购销合同）">
+                    <textarea id="custom-rule-desc" placeholder="规则描述"></textarea>
+                    <input class="text-input" id="custom-rule-keywords" placeholder="关键词（用英文逗号分隔）">
+                    <div class="btn-row">
+                        <button class="action-btn" onclick="saveCustomRule()">保存规则</button>
+                        <button class="action-btn ghost" onclick="resetCustomRuleForm()">重置</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3><i class="fa-solid fa-list"></i> 规则列表</h3>
+                    <ul id="custom-rule-list" class="list-group"></ul>
+                </div>
             </div>
 
-            <nav class="nav-menu">
-                <button class="nav-item active" onclick="switchTab('audit-panel')">
-                    <i class="fa-solid fa-shield-halved"></i> 业务审查端
-                </button>
-                <button class="nav-item" onclick="switchTab('ip-panel')">
-                    <i class="fa-solid fa-book-open"></i> 知识产权助手
-                </button>
-                <button class="nav-item" onclick="switchTab('admin-panel')">
-                    <i class="fa-solid fa-user-gear"></i> 管理维护端
-                </button>
-            </nav>
+            <div class="split-view">
+                <div class="card admin-card-layout">
+                    <h3><i class="fa-solid fa-database"></i> 法规规则库上传</h3>
+                    <div id="drop-area" class="upload-zone">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p>点击或拖拽文件上传</p>
+                        <p class="sub-text">支持 .txt .pdf .docx</p>
+                        <input type="file" id="rule-files" multiple hidden>
+                    </div>
+                    <div id="file-preview" class="file-preview-list"></div>
+                    <button class="action-btn bottom-btn" onclick="uploadRules()">开始入库</button>
+                </div>
 
-            <div class="status-card">
-                <h3>🚀 系统状态</h3>
-                <p><i class="fa-solid fa-bolt"></i> 引擎：Qwen-Plus</p>
-                <p><i class="fa-solid fa-server"></i> 模式：Local RAG</p>
-                <p><i class="fa-solid fa-memory"></i> 显存：保护中</p>
+                <div class="card">
+                    <h3><i class="fa-solid fa-folder-open"></i> 已入库法规清单</h3>
+                    <ul id="rule-list" class="list-group"></ul>
+                </div>
             </div>
-        </aside>
+        </section>
 
-        <main class="main-content">
-            <header>
-                <h1>公平竞争智能审查辅助系统</h1>
-            </header>
-
-            <section id="audit-panel" class="panel active">
-                <div class="split-view">
-                    <div class="card input-card">
-                        <h3><i class="fa-solid fa-pen-nib"></i> 录入待审材料</h3>
-                        <textarea id="audit-text" placeholder="在此粘贴政策草案文本..."></textarea>
-                        <div class="file-upload-wrapper">
-                            <label for="audit-file">📄 上传文档 (PDF/DOCX)</label>
-                            <input type="file" id="audit-file" accept=".pdf,.docx">
-                            <span id="file-name-display">未选择文件</span>
-                            <button type="button" id="clear-file-btn" class="clear-file-btn hidden" onclick="clearSelectedFile()">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        </div>
-                        <button class="action-btn" onclick="startAudit()">🚀 启动全维度审查</button>
+        <section id="report-panel" class="panel">
+            <div class="split-view">
+                <div class="card">
+                    <h3><i class="fa-solid fa-clock-rotate-left"></i> 最近审查记录</h3>
+                    <div class="btn-row">
+                        <button class="action-btn ghost" onclick="reloadHistoryMini()">刷新</button>
+                        <button class="action-btn ghost" onclick="clearHistoryMini()">清空记录</button>
                     </div>
-
-                    <div class="card output-card">
-                        <h3><i class="fa-solid fa-chart-pie"></i> 智能审查报告</h3>
-                        <div id="audit-result" class="result-box">
-                            <div class="placeholder-text">💡 请在左侧提交内容后开始审查...</div>
-                        </div>
+                    <ul id="history-mini-list" class="list-group"></ul>
+                </div>
+                <div class="card">
+                    <h3><i class="fa-solid fa-file-export"></i> 报告输出</h3>
+                    <div class="btn-row">
+                        <button class="action-btn" onclick="exportLatestDocx()">导出Word</button>
+                        <button class="action-btn ghost" onclick="exportLatestPdf()">导出PDF</button>
+                    </div>
+                    <div id="report-preview" class="result-box">
+                        <div class="placeholder-text">完成一次审查后，这里显示最新报告预览。</div>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <section id="ip-panel" class="panel">
-                <div class="card chat-card">
-                    <h3><i class="fa-solid fa-comments"></i> 知识产权 AI 顾问</h3>
-                    <div id="chat-history" class="chat-box"></div>
-                    <div class="chat-input-area">
-                        <input type="text" id="ip-query" placeholder="输入专利或商标疑问...">
-                        <button onclick="sendIpQuery()"><i class="fa-solid fa-paper-plane"></i></button>
-                    </div>
+        <section id="knowledge-panel" class="panel">
+            <div class="card chat-card">
+                <h3><i class="fa-solid fa-gavel"></i> 法律知识检索</h3>
+                <div class="chat-input-area">
+                    <input type="text" id="knowledge-query" placeholder="输入关键词，例如：市场准入、行政垄断、数据出境">
+                    <button onclick="searchKnowledge()"><i class="fa-solid fa-magnifying-glass"></i></button>
                 </div>
-            </section>
+                <div id="knowledge-result" class="result-box"></div>
+            </div>
+        </section>
 
-            <section id="admin-panel" class="panel">
-                <div id="login-view" class="card login-card">
-                    <h3>🔐 管理员验证</h3>
-                    <input type="password" id="admin-pwd" placeholder="请输入管理员密码">
-                    <button class="action-btn" onclick="adminLogin()">解锁权限</button>
+        <section id="settings-panel" class="panel">
+            <div class="card" style="max-width: 860px;">
+                <h3><i class="fa-solid fa-sliders"></i> 系统参数设置</h3>
+                <label class="field-label">速度优先级</label>
+                <select id="setting-speed-mode" class="text-input">
+                    <option value="fast">fast</option>
+                    <option value="balanced">balanced</option>
+                    <option value="deep">deep</option>
+                </select>
+
+                <label class="field-label">高风险阈值 (0-1)</label>
+                <input id="setting-high" class="text-input" type="number" min="0" max="1" step="0.01">
+
+                <label class="field-label">中风险阈值 (0-1)</label>
+                <input id="setting-medium" class="text-input" type="number" min="0" max="1" step="0.01">
+
+                <label class="field-label">本地审查模式</label>
+                <select id="setting-local" class="text-input">
+                    <option value="true">开启</option>
+                    <option value="false">关闭</option>
+                </select>
+
+                <label class="field-label">临时数据保留天数</label>
+                <input id="setting-retain-days" class="text-input" type="number" min="1" max="365" step="1">
+
+                <div class="btn-row">
+                    <button class="action-btn" onclick="saveSettings()">保存设置</button>
+                    <button class="action-btn ghost" onclick="loadSettings()">重新加载</button>
                 </div>
+            </div>
+        </section>
+    </main>
+</div>
 
-                <div id="admin-view" class="split-view hidden">
-                    <div class="card admin-card-layout">
-                        <h3>📥 规则库更新</h3>
-
-                        <div id="drop-area" class="upload-zone">
-                            <i class="fa-solid fa-cloud-arrow-up"></i>
-                            <p>点击此处 或 将文件拖拽至此</p>
-                            <p class="sub-text">支持 .txt .pdf .docx</p>
-                            <input type="file" id="rule-files" multiple hidden>
-                        </div>
-
-                        <div id="file-preview" class="file-preview-list"></div>
-
-                        <button class="action-btn bottom-btn" onclick="uploadRules()">开始向量化入库</button>
-                    </div>
-
-                    <div class="card">
-                        <h3>📂 现有规则清单</h3>
-                        <ul id="rule-list" class="list-group">
-                            </ul>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <script src="/static/js/script.js"></script>
+<script src="/static/js/script.js"></script>
 </body>
 </html>

@@ -1,4 +1,7 @@
 flask
-dashscope
+gunicorn
+requests
 python-docx
 pypdf2
+python-dotenv
+reportlab
